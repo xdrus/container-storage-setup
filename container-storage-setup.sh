@@ -78,6 +78,9 @@ _STORAGE_OPTIONS="STORAGE_OPTIONS"
 # Keeps track of if we created a volume group or not.
 _VG_CREATED=
 
+# Do we have parted
+_PARTED=$(which parted || echo "")
+
 get_docker_version() {
   local version
 
@@ -834,7 +837,7 @@ create_partition_parted(){
 create_partition() {
   local dev="$1" part
 
-  if [ -x "/usr/sbin/parted" ]; then
+  if [ -x "${_PARTED}" ]; then
     create_partition_parted $dev
   else
     create_partition_sfdisk $dev
@@ -879,7 +882,7 @@ create_disk_partitions() {
 remove_partition() {
   local dev="$1"
 
-  if [ -x "/usr/sbin/parted" ]; then
+  if [ -x "${_PARTED}" ]; then
     parted "$dev" rm 1 >/dev/null
   else
     sfdisk --delete "$dev" 1 >/dev/null
